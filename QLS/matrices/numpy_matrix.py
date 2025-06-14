@@ -6,7 +6,7 @@ import scipy as sp
 
 from qiskit import QuantumCircuit, QuantumRegister
 
-from matrices.linear_system_matrix import LinearSystemMatrix
+from QLS.matrices.linear_system_matrix import LinearSystemMatrix
 
 
 class NumPyMatrix(LinearSystemMatrix):

@@ -10,9 +10,9 @@ from qiskit.circuit.library.arithmetic.exact_reciprocal import ExactReciprocal
 from qiskit.providers import Backend
 from qiskit.quantum_info.operators import Operator, Pauli, SparsePauliOp
 from qiskit.primitives import BackendEstimator, StatevectorEstimator
-from linear_solver import LinearSolver, LinearSolverResult
-from matrices.numpy_matrix import NumPyMatrix
-from observables.linear_system_observable import LinearSystemObservable
+from QLS.linear_solver import LinearSolver, LinearSolverResult
+from QLS.matrices.numpy_matrix import NumPyMatrix
+from QLS.observables.linear_system_observable import LinearSystemObservable
 from qiskit.circuit.library import StatePreparation
 
 class HHL(LinearSolver):

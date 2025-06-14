@@ -6,8 +6,8 @@ import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Operator, Statevector
 
-from linear_solver import LinearSolverResult, LinearSolver
-from observables.linear_system_observable import LinearSystemObservable
+from QLS.linear_solver import LinearSolverResult, LinearSolver
+from QLS.observables.linear_system_observable import LinearSystemObservable
 
 # pylint: disable=too-few-public-methods
 

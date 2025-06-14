@@ -4,7 +4,7 @@ import numpy as np
 from qiskit import QuantumCircuit, transpile
 from qiskit.visualization import plot_histogram
 from qiskit_aer import AerSimulator
-from matrices.tridiagonal_toeplitz import TridiagonalToeplitz
+from QLS.matrices.tridiagonal_toeplitz import TridiagonalToeplitz
 
 def print_matrix_info(matrix_obj):
     """Print information about the matrix."""
