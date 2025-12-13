@@ -9,7 +9,12 @@ from qiskit.circuit.library.arithmetic.piecewise_chebyshev import PiecewiseCheby
 from qiskit.circuit.library.arithmetic.exact_reciprocal import ExactReciprocal
 from qiskit.providers import Backend
 from qiskit.quantum_info.operators import Operator, Pauli, SparsePauliOp
-from qiskit.primitives import BackendEstimator, StatevectorEstimator
+from qiskit.primitives import StatevectorEstimator
+try:
+    from qiskit.primitives import BackendEstimator
+except ImportError:
+    # In Qiskit 2.2+, BackendEstimator doesn't exist, use qiskit_aer.primitives.Estimator instead
+    BackendEstimator = None
 from QLS.linear_solver import LinearSolver, LinearSolverResult
 from QLS.matrices.numpy_matrix import NumPyMatrix
 from QLS.observables.linear_system_observable import LinearSystemObservable
@@ -98,13 +103,14 @@ class HHL(LinearSolver):
 
         self._scaling = None  # scaling of the solution
 
-        # Replace CircuitSampler with Estimator
-        from qiskit.primitives import Estimator
+        # Store the backend for statevector simulation
+        # For statevector simulation with a backend, we'll use Statevector directly
+        # The Estimator pattern is mainly for sampling-based backends
+        self._quantum_instance = quantum_instance
         self._sampler = None
-        if quantum_instance is not None:
-            from qiskit.primitives import BackendEstimator
-            self._sampler = BackendEstimator(backend=quantum_instance)
-        else:
+        # Always use StatevectorEstimator or None - we'll use Statevector.from_instruction
+        # with the backend when needed
+        if quantum_instance is None:
             from qiskit.primitives import StatevectorEstimator
             self._sampler = StatevectorEstimator()  # For statevector simulation
 
@@ -122,7 +128,8 @@ class HHL(LinearSolver):
         Returns:
             The quantum instance used to run this algorithm.
         """
-        return None if self._sampler is None or not isinstance(self._sampler, BackendEstimator) else self._sampler.backend
+        # Return the stored quantum instance
+        return self._quantum_instance
 
     @quantum_instance.setter
     def quantum_instance(
@@ -134,9 +141,12 @@ class HHL(LinearSolver):
             quantum_instance: A Qiskit Backend used to run this algorithm.
                 If None, a Statevector calculation is done using StatevectorEstimator elsewhere.
         """
-        if quantum_instance is not None:
-            from qiskit.primitives import BackendEstimator
-            self._sampler = BackendEstimator(backend=quantum_instance)
+        self._quantum_instance = quantum_instance
+        # Always use StatevectorEstimator or None - we'll use Statevector.from_instruction
+        # with the backend when needed
+        if quantum_instance is None:
+            from qiskit.primitives import StatevectorEstimator
+            self._sampler = StatevectorEstimator()
         else:
             self._sampler = None
     @property
@@ -231,7 +241,7 @@ class HHL(LinearSolver):
 
         # Import required classes
         from qiskit.quantum_info import SparsePauliOp, Statevector
-        from qiskit.primitives import StatevectorEstimator, BackendEstimator
+        from qiskit.primitives import StatevectorEstimator
 
         # Create the Operators Zero and One as Pauli operators
         zero_op = SparsePauliOp.from_list([("I", 0.5), ("Z", 0.5)])  # (I + Z) / 2
@@ -244,15 +254,11 @@ class HHL(LinearSolver):
         observable = one_op.tensor(zero_tensor).tensor(SparsePauliOp("I" * nb))
 
         # Compute the expectation value
-        if self._sampler is None or isinstance(self._sampler, StatevectorEstimator):
-            # Simulate the circuit directly with Statevector
-            state = Statevector.from_instruction(qc)
-            # Compute expectation value manually
-            norm_2 = state.expectation_value(observable).real
-        else:
-            # Assume BackendEstimator
-            result = self._sampler.run(qc, observables=observable).result()
-            norm_2 = result.values[0]  # Expectation value from BackendEstimator
+        # Use Statevector simulation
+        # Statevector.from_instruction works directly and efficiently
+        state = Statevector.from_instruction(qc)
+        # Compute expectation value manually
+        norm_2 = state.expectation_value(observable).real
 
         return np.real(np.sqrt(norm_2) / self.scaling)
 
@@ -281,7 +287,7 @@ class HHL(LinearSolver):
 
         # Import required classes
         from qiskit.quantum_info import SparsePauliOp, Statevector
-        from qiskit.primitives import StatevectorEstimator, BackendEstimator
+        from qiskit.primitives import StatevectorEstimator
 
         # Default observable is identity on solution qubits
         observable = SparsePauliOp("I" * nb)
@@ -318,19 +324,14 @@ class HHL(LinearSolver):
             circuits.append(circuit)
             observables.append(ob)
 
-        # Compute expectation values based on sampler type
-        if self._sampler is None or isinstance(self._sampler, StatevectorEstimator):
-            # Simulate circuits directly with Statevector
-            expectation_results = []
-            for circ in circuits:
-                state = Statevector.from_instruction(circ)
-                exp_value = state.expectation_value(observables[circuits.index(circ)]).real
-                expectation_results.append(exp_value)
-            expectation_results = expectation_results if is_list else expectation_results[0]
-        else:
-            # Use BackendEstimator
-            result = self._sampler.run(circuits, observables=observables).result()
-            expectation_results = result.values if is_list else result.values[0]
+        # Compute expectation values using Statevector simulation
+        # Statevector.from_instruction works directly and efficiently
+        expectation_results = []
+        for circ in circuits:
+            state = Statevector.from_instruction(circ)
+            exp_value = state.expectation_value(observables[circuits.index(circ)]).real
+            expectation_results.append(exp_value)
+        expectation_results = expectation_results if is_list else expectation_results[0]
 
         # Apply post_processing (default to identity if None)
         if post_processing is None:
@@ -556,8 +557,11 @@ class HHL(LinearSolver):
                 )
 
         solution = LinearSolverResult()
+        print("  Constructing HHL circuit...")
         solution.state = self.construct_circuit(matrix, vector)
+        print("  Circuit constructed. Calculating norm...")
         solution.euclidean_norm = self._calculate_norm(solution.state)
+        print("  Norm calculated.")
 
         if isinstance(observable, List):
             observable_all, circuit_results_all = [], []
