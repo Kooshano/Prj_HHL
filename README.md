@@ -225,6 +225,7 @@ Prj_HHL/
 ├── environment.yml              # Conda environment
 ├── .env.example                 # Environment variables template
 ├── .gitignore                   # Git ignore rules
+├── LICENSE                      # MIT License
 └── VERSION_FIX.md              # Version compatibility troubleshooting guide
 ```
 
@@ -471,7 +472,7 @@ For large matrices:
 
 ## 📝 License
 
-[Add your license information here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -480,7 +481,10 @@ For large matrices:
 
 ## 📧 Contact
 
-[Add contact information if needed]
+- **Website**: [Kooshan.info](https://Kooshan.info)
+- **Project Repository**: [GitHub Repository](https://github.com/yourusername/Prj_HHL) *(update with your actual repository URL)*
+
+For questions, issues, or contributions, please visit the project repository or contact through the website.
 
 ---
 
