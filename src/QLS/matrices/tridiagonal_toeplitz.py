@@ -7,7 +7,7 @@ from scipy.sparse import diags
 from qiskit.circuit import QuantumCircuit, QuantumRegister, AncillaRegister
 from qiskit.circuit.library import UGate, MCMTVChain
 
-from QLS.matrices.linear_system_matrix import LinearSystemMatrix
+from .linear_system_matrix import LinearSystemMatrix
 
 
 class TridiagonalToeplitz(LinearSystemMatrix):

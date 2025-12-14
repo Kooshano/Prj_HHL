@@ -15,9 +15,9 @@ try:
 except ImportError:
     # In Qiskit 2.2+, BackendEstimator doesn't exist, use qiskit_aer.primitives.Estimator instead
     BackendEstimator = None
-from QLS.linear_solver import LinearSolver, LinearSolverResult
-from QLS.matrices.numpy_matrix import NumPyMatrix
-from QLS.observables.linear_system_observable import LinearSystemObservable
+from .linear_solver import LinearSolver, LinearSolverResult
+from .matrices.numpy_matrix import NumPyMatrix
+from .observables.linear_system_observable import LinearSystemObservable
 from qiskit.circuit.library import StatePreparation
 
 class HHL(LinearSolver):

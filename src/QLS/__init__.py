@@ -33,9 +33,9 @@ Example Usage:
 __version__ = "1.0.0"
 
 # Main exports
-from QLS.hhl import HHL
-from QLS.numpy_linear_solver import NumPyLinearSolver
-from QLS.linear_solver import LinearSolver, LinearSolverResult
+from .hhl import HHL
+from .numpy_linear_solver import NumPyLinearSolver
+from .linear_solver import LinearSolver, LinearSolverResult
 
 __all__ = [
     'HHL',

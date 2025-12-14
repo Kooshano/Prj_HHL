@@ -9,7 +9,7 @@ from scipy.sparse import diags
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Statevector, SparsePauliOp
 
-from QLS.observables.linear_system_observable import LinearSystemObservable
+from .linear_system_observable import LinearSystemObservable
 
 
 class MatrixFunctional(LinearSystemObservable):
