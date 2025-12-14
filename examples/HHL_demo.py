@@ -1,12 +1,19 @@
 #!/usr/bin/env python
 """Complete HHL Demo - Optimized for quick demonstration"""
 
+import sys
+from pathlib import Path
+
+# Add project root to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
 import numpy as np
 from scipy.sparse import coo_matrix
-from qiskit_aer import AerSimulator
 from qiskit.quantum_info import Statevector
 from QLS.numpy_linear_solver import NumPyLinearSolver
 from QLS.hhl import HHL
+from QLS.gpu_utils import create_gpu_backend, print_gpu_info, get_gpu_info
 import time
 
 print("="*70)
@@ -75,10 +82,16 @@ print("\n" + "-"*70)
 print("QUANTUM (HHL) SOLUTION")
 print("-"*70)
 
-# Setup backend
-backend = AerSimulator(method='statevector', device='CPU', precision='double')
-print(f"Backend: {backend.name}")
-print(f"Available devices: {backend.available_devices()}")
+# Setup GPU backend with automatic fallback to CPU
+print("\nSetting up quantum backend...")
+gpu_info = get_gpu_info()
+print_gpu_info(gpu_info)
+
+backend, use_gpu = create_gpu_backend(
+    method='statevector',
+    precision='double',
+    verbose=True
+)
 
 # Solve with HHL
 start_time = time.time()

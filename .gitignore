@@ -41,9 +41,15 @@ ENV/
 .DS_Store
 Thumbs.db
 
+# Environment variables
+.env
+.env.local
+.env.*.local
+
 # Project specific
-logs/*.json
+logs/
 *.log
+!logs/.gitkeep
 
 # Temporary files
 *.tmp

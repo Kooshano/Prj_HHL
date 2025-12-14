@@ -104,15 +104,13 @@ class HHL(LinearSolver):
         self._scaling = None  # scaling of the solution
 
         # Store the backend for statevector simulation
-        # For statevector simulation with a backend, we'll use Statevector directly
-        # The Estimator pattern is mainly for sampling-based backends
         self._quantum_instance = quantum_instance
-        self._sampler = None
-        # Always use StatevectorEstimator or None - we'll use Statevector.from_instruction
-        # with the backend when needed
-        if quantum_instance is None:
+        # Create BackendEstimator if backend is provided, otherwise use StatevectorEstimator
+        if quantum_instance is not None and BackendEstimator is not None:
+            self._sampler = BackendEstimator(backend=quantum_instance)
+        else:
             from qiskit.primitives import StatevectorEstimator
-            self._sampler = StatevectorEstimator()  # For statevector simulation
+            self._sampler = StatevectorEstimator()  # For statevector simulation without backend
 
         self._expectation = None  # Set to None as Estimator handles expectations
 
@@ -142,13 +140,12 @@ class HHL(LinearSolver):
                 If None, a Statevector calculation is done using StatevectorEstimator elsewhere.
         """
         self._quantum_instance = quantum_instance
-        # Always use StatevectorEstimator or None - we'll use Statevector.from_instruction
-        # with the backend when needed
-        if quantum_instance is None:
-            from qiskit.primitives import StatevectorEstimator
-            self._sampler = StatevectorEstimator()
+        # Create BackendEstimator if backend is provided, otherwise use StatevectorEstimator
+        if quantum_instance is not None and BackendEstimator is not None:
+            self._sampler = BackendEstimator(backend=quantum_instance)
         else:
-            self._sampler = None
+            from qiskit.primitives import StatevectorEstimator
+            self._sampler = StatevectorEstimator()  # For statevector simulation without backend
     @property
     def scaling(self) -> float:
         """The scaling of the solution vector."""
@@ -254,9 +251,29 @@ class HHL(LinearSolver):
         observable = one_op.tensor(zero_tensor).tensor(SparsePauliOp("I" * nb))
 
         # Compute the expectation value
-        # Use Statevector simulation
-        # Statevector.from_instruction works directly and efficiently
-        state = Statevector.from_instruction(qc)
+        # Use backend if available and save_statevector is supported, otherwise use Statevector simulation
+        if self._quantum_instance is not None and hasattr(self._quantum_instance, 'run'):
+            # For AerSimulator (Backend), try to use save_statevector() instruction
+            from qiskit import transpile
+            try:
+                # Try Qiskit 2.x API first (save_statevector with label)
+                qc_with_save = qc.copy()
+                if hasattr(qc_with_save, 'save_statevector'):
+                    # Qiskit 2.x: save_statevector is a method
+                    qc_with_save.save_statevector(label='statevector')
+                    qc_transpiled = transpile(qc_with_save, backend=self._quantum_instance)
+                    # Run on backend
+                    result = self._quantum_instance.run(qc_transpiled).result()
+                    state = result.get_statevector(qc_with_save)
+                else:
+                    # save_statevector not available, use Statevector directly
+                    state = Statevector.from_instruction(qc)
+            except (AttributeError, TypeError, ValueError) as e:
+                # If save_statevector doesn't work, fall back to Statevector simulation
+                state = Statevector.from_instruction(qc)
+        else:
+            # Use Statevector simulation directly (when quantum_instance is None or StatevectorEstimator)
+            state = Statevector.from_instruction(qc)
         # Compute expectation value manually
         norm_2 = state.expectation_value(observable).real
 
@@ -324,11 +341,31 @@ class HHL(LinearSolver):
             circuits.append(circuit)
             observables.append(ob)
 
-        # Compute expectation values using Statevector simulation
-        # Statevector.from_instruction works directly and efficiently
+        # Compute expectation values using backend if available, otherwise Statevector simulation
         expectation_results = []
         for circ in circuits:
-            state = Statevector.from_instruction(circ)
+            if self._quantum_instance is not None and hasattr(self._quantum_instance, 'run'):
+                # For AerSimulator (Backend), try to use save_statevector() instruction
+                from qiskit import transpile
+                try:
+                    # Try Qiskit 2.x API first (save_statevector with label)
+                    circ_with_save = circ.copy()
+                    if hasattr(circ_with_save, 'save_statevector'):
+                        # Qiskit 2.x: save_statevector is a method
+                        circ_with_save.save_statevector(label='statevector')
+                        circ_transpiled = transpile(circ_with_save, backend=self._quantum_instance)
+                        # Run on backend
+                        result = self._quantum_instance.run(circ_transpiled).result()
+                        state = result.get_statevector(circ_with_save)
+                    else:
+                        # save_statevector not available, use Statevector directly
+                        state = Statevector.from_instruction(circ)
+                except (AttributeError, TypeError, ValueError) as e:
+                    # If save_statevector doesn't work, fall back to Statevector simulation
+                    state = Statevector.from_instruction(circ)
+            else:
+                # Use Statevector simulation directly (when quantum_instance is None or StatevectorEstimator)
+                state = Statevector.from_instruction(circ)
             exp_value = state.expectation_value(observables[circuits.index(circ)]).real
             expectation_results.append(exp_value)
         expectation_results = expectation_results if is_list else expectation_results[0]
@@ -557,11 +594,8 @@ class HHL(LinearSolver):
                 )
 
         solution = LinearSolverResult()
-        print("  Constructing HHL circuit...")
         solution.state = self.construct_circuit(matrix, vector)
-        print("  Circuit constructed. Calculating norm...")
         solution.euclidean_norm = self._calculate_norm(solution.state)
-        print("  Norm calculated.")
 
         if isinstance(observable, List):
             observable_all, circuit_results_all = [], []
