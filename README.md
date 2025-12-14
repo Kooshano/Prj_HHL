@@ -18,8 +18,10 @@ A comprehensive implementation of the **Harrow-Hassidim-Lloyd (HHL)** quantum al
 - [Project Structure](#project-structure)
 - [Usage Examples](#usage-examples)
 - [GPU Support](#gpu-support)
-- [Configuration](#configuration)
+- [Logging System](#logging-system)
 - [Documentation](#documentation)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
 
 ## 🔧 Installation
 
@@ -109,7 +111,7 @@ qiskit-aer: 0.17.x
 conda activate HHL
 
 # Run the build script
-./build_gpu_aer.sh
+./scripts/setup_gpu.sh build
 ```
 
 This script will:
@@ -129,10 +131,10 @@ For detailed manual build instructions, see [docs/INSTALL_GPU.md](docs/INSTALL_G
 
 ```bash
 # Quick test
-python examples/gpu_test.py
+python scripts/gpu_test.py
 
 # Detailed diagnostic
-python examples/check_gpu_support.py
+python scripts/check_gpu_support.py
 ```
 
 ## 🎯 Quick Start
@@ -320,7 +322,7 @@ See [docs/INSTALL_GPU.md](docs/INSTALL_GPU.md) for detailed instructions.
 **Quick build**:
 ```bash
 conda activate HHL
-./build_gpu_aer.sh
+./scripts/setup_gpu.sh build
 ```
 
 ### Performance Comparison
@@ -454,7 +456,7 @@ conda activate HHL
 
 If GPU is not working:
 1. Check CUDA installation: `nvcc --version`
-2. Run diagnostic: `python examples/check_gpu_support.py`
+2. Run diagnostic: `python scripts/check_gpu_support.py`
 3. See [docs/INSTALL_GPU.md](docs/INSTALL_GPU.md) for build instructions
 
 ### Verification
