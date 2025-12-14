@@ -6,9 +6,10 @@ Diagnostic script to check GPU support status for Qiskit Aer.
 import sys
 from pathlib import Path
 
-# Add project root to Python path
+# Add src directory to Python path
 project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
+src_path = project_root / 'src'
+sys.path.insert(0, str(src_path))
 
 print("="*70)
 print("QISKIT AER GPU SUPPORT DIAGNOSTIC")

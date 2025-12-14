@@ -3,12 +3,18 @@ import numpy as np
 from scipy.sparse import coo_matrix
 from qiskit.quantum_info import Statevector
 import os
+import sys
 from pathlib import Path
+
+# Add src directory to Python path
+project_root = Path(__file__).parent.parent
+src_path = project_root / 'src'
+sys.path.insert(0, str(src_path))
 
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
-    env_path = Path(__file__).parent / '.env'
+    env_path = project_root / '.env'
     load_dotenv(dotenv_path=env_path)
     print(f"✓ Loaded configuration from .env file")
 except ImportError:

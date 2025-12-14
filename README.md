@@ -166,7 +166,7 @@ print(f"Euclidean norm: {result.euclidean_norm}")
 
 ```bash
 # Run the full demonstration
-python HHL_Project.py
+python scripts/HHL_Project.py
 ```
 
 This will:
@@ -188,45 +188,46 @@ python examples/HHL_demo.py
 
 ```
 Prj_HHL/
-├── QLS/                          # Main quantum linear solver package
-│   ├── __init__.py               # Package initialization
-│   ├── hhl.py                    # HHL quantum solver implementation
-│   ├── linear_solver.py          # Base linear solver interface
-│   ├── numpy_linear_solver.py    # Classical NumPy-based solver
-│   ├── gpu_utils.py              # GPU backend utilities
-│   ├── matrices/                 # Matrix implementations
-│   │   ├── __init__.py
-│   │   ├── linear_system_matrix.py
-│   │   ├── numpy_matrix.py
-│   │   └── tridiagonal_toeplitz.py
-│   └── observables/              # Quantum observables
-│       ├── __init__.py
-│       ├── absolute_average.py
-│       ├── linear_system_observable.py
-│       └── matrix_functional.py
+├── src/                          # Source code
+│   ├── QLS/                      # Main quantum linear solver package
+│   │   ├── __init__.py           # Package initialization
+│   │   ├── hhl.py                # HHL quantum solver implementation
+│   │   ├── linear_solver.py      # Base linear solver interface
+│   │   ├── numpy_linear_solver.py # Classical NumPy-based solver
+│   │   ├── gpu_utils.py          # GPU backend utilities
+│   │   ├── matrices/             # Matrix implementations
+│   │   │   ├── __init__.py
+│   │   │   ├── linear_system_matrix.py
+│   │   │   ├── numpy_matrix.py
+│   │   │   └── tridiagonal_toeplitz.py
+│   │   └── observables/          # Quantum observables
+│   │       ├── __init__.py
+│   │       ├── absolute_average.py
+│   │       ├── linear_system_observable.py
+│   │       └── matrix_functional.py
+│   └── dataset.py                # Dataset loader module
+├── scripts/                      # Executable scripts
+│   ├── HHL_Project.py            # Main project script
+│   ├── setup_gpu.sh              # GPU setup and testing script
+│   ├── check_gpu_support.py      # GPU diagnostic script
+│   └── gpu_test.py               # GPU compatibility test
 ├── notebooks/                    # Jupyter notebooks
-│   └── simple_example.ipynb     # Simple example notebook
+│   └── simple_example.ipynb      # Simple example notebook
 ├── examples/                     # Example scripts
-│   ├── HHL_demo.py              # Quick demonstration
-│   ├── gpu_test.py              # GPU compatibility test
-│   └── check_gpu_support.py    # Detailed GPU diagnostic
-├── tests/                        # Test files
-│   └── test.py
+│   └── HHL_demo.py               # Quick demonstration
 ├── data/                         # Data files (CSV datasets)
 │   ├── Fish.csv
 │   └── housing.csv
 ├── logs/                         # Runtime logs (gitignored)
 │   └── .gitkeep
-├── docs/                        # Documentation
-│   └── INSTALL_GPU.md           # GPU installation guide
-├── HHL_Project.py                # Main project script
-├── build_gpu_aer.sh             # Build script for GPU support
-├── requirements.txt             # Python dependencies
-├── environment.yml              # Conda environment
-├── .env.example                 # Environment variables template
-├── .gitignore                   # Git ignore rules
-├── LICENSE                      # MIT License
-└── VERSION_FIX.md              # Version compatibility troubleshooting guide
+├── docs/                         # Documentation
+│   └── INSTALL_GPU.md            # GPU installation guide
+├── requirements.txt              # Python dependencies
+├── environment.yml               # Conda environment
+├── .env.example                  # Environment variables template
+├── .gitignore                    # Git ignore rules
+├── LICENSE                       # MIT License
+└── VERSION_FIX.md                # Version compatibility troubleshooting guide
 ```
 
 ## 💡 Usage Examples
@@ -257,11 +258,11 @@ print(f"Quantum solution: {quantum_result.state}")
 
 ### Linear Regression with HHL
 
-The main script (`HHL_Project.py`) includes a complete linear regression example comparing HHL with scikit-learn. To run it:
+The main script (`scripts/HHL_Project.py`) includes a complete linear regression example comparing HHL with scikit-learn. To run it:
 
 ```bash
 # Set LIGHTWEIGHT_MODE=False in .env or environment
-python HHL_Project.py
+python scripts/HHL_Project.py
 ```
 
 ### Configuration via Environment Variables
@@ -482,7 +483,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📧 Contact
 
 - **Website**: [Kooshan.info](https://Kooshan.info)
-- **Project Repository**: [GitHub Repository](https://github.com/yourusername/Prj_HHL) *(update with your actual repository URL)*
 
 For questions, issues, or contributions, please visit the project repository or contact through the website.
 

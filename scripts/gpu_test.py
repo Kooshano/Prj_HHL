@@ -6,9 +6,10 @@ Quick test script to verify GPU support is working correctly.
 import sys
 from pathlib import Path
 
-# Add project root to Python path
+# Add src directory to Python path
 project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
+src_path = project_root / 'src'
+sys.path.insert(0, str(src_path))
 
 from QLS.gpu_utils import create_gpu_backend, print_gpu_info, get_gpu_info, create_cpu_backend
 from qiskit import QuantumCircuit

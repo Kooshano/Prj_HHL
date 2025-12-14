@@ -50,6 +50,7 @@ Thumbs.db
 logs/
 *.log
 !logs/.gitkeep
+data/
 
 # Temporary files
 *.tmp
